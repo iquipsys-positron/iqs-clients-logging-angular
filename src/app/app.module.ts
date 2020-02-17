@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { IqsShellModule, IqsShellContainerComponent/*, CustomRouterStateSerializer*/ } from 'iqs-libs-clientshell-angular';
+import { IqsShellModule, IqsShellContainerComponent/*, CustomRouterStateSerializer*/ } from 'iqs-libs-clientshell2-angular';
 // import {
 //   StoreRouterConnectingModule,
 //   RouterStateSerializer,

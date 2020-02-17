@@ -4,7 +4,7 @@
 //     MetaReducer,
 // } from '@ngrx/store';
 // import * as fromRouter from '@ngrx/router-store';
-// import { RouterStateUrl } from 'iqs-libs-clientshell-angular';
+// import { RouterStateUrl } from 'iqs-libs-clientshell2-angular';
 // import { storeFreeze } from 'ngrx-store-freeze';
 
 // import { environment } from '../../../environments/environment';
