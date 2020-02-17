@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { EntryService } from '@iquipsys/pip-suite2-entry';
-import { LocalStorageService } from 'angular-2-local-storage';
+import { IqsSessionConfigService } from 'iqs-libs-clientshell2-angular';
 import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
@@ -13,8 +12,7 @@ export class LogsDataService {
 
     public constructor(
         private http: HttpClient,
-        private localStorageService: LocalStorageService,
-        private entryService: EntryService
+        private sessionConfig: IqsSessionConfigService
     ) { }
 
     private handleError(response: Response) {
@@ -23,7 +21,7 @@ export class LogsDataService {
     }
 
     public getLogGroups(groupNamePrefix?: string, limit?: number): Observable<any> {
-        let url = this.entryService.serverUrl + this.logGroupsUrl;
+        let url = this.sessionConfig.serverUrl + this.logGroupsUrl;
 
         url += '?name_prefix=' + groupNamePrefix;
 
@@ -39,7 +37,7 @@ export class LogsDataService {
     }
 
     public getLogStreams(group: string, streamNamePrefix?: string, limit?: number): Observable<any> {
-        let url = this.entryService.serverUrl + this.logStreamsUrl;
+        let url = this.sessionConfig.serverUrl + this.logStreamsUrl;
 
         url += '?group=' + group;
 
@@ -63,7 +61,7 @@ export class LogsDataService {
 
     public getLogEvents(group: string, stream: string, startTime: string, endTime: string,
         filter: string, limit?: number): Observable<any> {
-        let url = this.entryService.serverUrl + this.logEventsUrl;
+        let url = this.sessionConfig.serverUrl + this.logEventsUrl;
 
         url += '?group=' + group +
             '&stream=' + stream +

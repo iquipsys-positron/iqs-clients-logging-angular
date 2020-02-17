@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { IqsSettingsService } from '@iquipsys/iqs-admin-shell';
+import { IqsSettingsService } from 'iqs-libs-clientshell-angular';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { TranslateModule } from '@ngx-translate/core';

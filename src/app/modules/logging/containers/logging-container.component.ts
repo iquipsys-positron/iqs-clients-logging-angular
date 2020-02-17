@@ -73,7 +73,7 @@ export class LoggingContainerComponent implements OnInit, OnDestroy {
         this.selectedIndex = 0;
         for (let k = 0; k < i; k++) {
             this.selectedIndex += this.logStreams[k].length;
-            
+
         }
         this.selectedIndex += j;
         this.selectedGroup = i;
@@ -134,14 +134,16 @@ export class LoggingContainerComponent implements OnInit, OnDestroy {
         series([
             (callback) => {
                 this.logsDataService.getLogGroups('positron').subscribe((res) => {
-                    res.logGroups.forEach(i => {
-                        this.logGroups.push(i.logGroupName);
-                    });
+                    if (res) {
+                        res.logGroups.forEach(i => {
+                            this.logGroups.push(i.logGroupName);
+                        });
+                    }
                     callback(null, this.logGroups);
                 });
             },
             (callback) => {
-                
+
                 let i = 0;
                 each(this.logGroups, (logGroup, callback) => {
 
