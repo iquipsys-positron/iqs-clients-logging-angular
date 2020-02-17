@@ -1,0 +1,83 @@
+<div fxFlex="grow">
+    <pip-menu-layout [single]="isSingle">
+
+        <div class="pip-menu">
+            <ng-container [ngSwitch]="menuBusy$ | async">
+                <div class="empty-state-menu" *ngSwitchCase="true"></div>
+                <pip-selected *ngSwitchCase="false" (onSelect)="selectedIndex = $event.index" [index]="selectedIndex">
+                    <mat-nav-list>
+                        <ng-container *ngFor="let group of logGroups; let i = index">
+                            <h2>{{ group }}</h2>
+                            <mat-list-item *ngFor="let item of logStreams[i]; let j = index" pipSelectable (click)="onItemClick(i, j)">
+                                <h4 md-line>{{ item.title }}</h4>
+                            </mat-list-item>
+                        </ng-container>
+                    </mat-nav-list>
+                </pip-selected>
+            </ng-container>
+        </div>
+
+        <div class="pip-menu-container">
+
+            <pip-document-layout>
+                <pip-document-content fxFlex="fill">
+
+                    <mat-progress-bar *ngIf="logsLoading$ | async" class="logs-loading-progress-bar" mode="indeterminate"></mat-progress-bar>
+
+                    <ng-container [ngSwitch]="contentBusy$ | async">
+
+                        <pip-empty-state *ngSwitchCase="true">
+                            <pip-empty-state-title [text]="'MESSAGE.LOADING' | translate" imageUrl="./assets/progress.svg"></pip-empty-state-title>
+                            <div class="pip-progress">
+                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                            </div>
+                        </pip-empty-state>
+
+                        <div *ngSwitchCase="false">
+
+                            <div>
+                                <div>{{'DATE_START' | translate}}</div>
+                                <div>
+                                    <pip-time-range-edit [startDate]="startDate$ | async" [endDate]="endDate$ | async"
+                                        (startDateChange)="onStartDateChange($event)" (endDateChange)="onEndDateChange($event)">
+                                    </pip-time-range-edit>
+                                </div>
+                            </div>
+
+                            <mat-form-field class="search-field" floatLabel="never" appearance="fill">
+                                <mat-icon matPrefix fontIcon="webui-search"></mat-icon>
+                                <input matInput placeholder="{{ 'SEARCH_PLACEHOLDER' | translate }}" name="search"
+                                    [(ngModel)]="search" (ngModelChange)="filterLogs()">
+                            </mat-form-field>
+
+
+                            <table class="mat-elevation-z8 mat-table" pipInfiniteScroll (onInfiniteScroll)="loadMore()"
+                                scrollContainer="pip-scrollable-content" scrollListenForEvent="windowResized"
+                                scrollDistance="0.1">
+                                <thead>
+                                    <tr class="mat-header-row">
+                                        <th class="mat-header-cell">Time</th>
+                                        <th class="mat-header-cell">Message</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <ng-container *ngFor="let d of logs">
+                                        <tr class="mat-header-row">
+                                            <td class="mat-cell">{{ d.time | date: 'dd/MMM/yyyy HH:mm:ss z' }}</td>
+                                            <td class="mat-cell">{{ d.message }}</td>
+                                        </tr>
+                                    </ng-container>
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                    </ng-container>
+
+                </pip-document-content>
+            </pip-document-layout>
+
+        </div>
+
+    </pip-menu-layout>
+</div>
