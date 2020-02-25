@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { IqsSessionConfigService } from 'iqs-libs-clientshell2-angular';
 import { Observable } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
 
 @Injectable()
 export class LogsDataService {
@@ -15,25 +14,10 @@ export class LogsDataService {
         private sessionConfig: IqsSessionConfigService
     ) { }
 
-    private handleError(response: Response) {
-        const error = response.json();
-        return Observable.throw(error);
-    }
-
     public getLogGroups(groupNamePrefix?: string, limit?: number): Observable<any> {
         let url = this.sessionConfig.serverUrl + this.logGroupsUrl;
-
         url += '?name_prefix=' + groupNamePrefix;
-
-        const request: any = {};
-
-        return this.http.get(url, request)
-            .pipe(
-                map(response => {
-                    return response;
-                }),
-                catchError(this.handleError)
-            );
+        return this.http.get<any[]>(url);
     }
 
     public getLogStreams(group: string, streamNamePrefix?: string, limit?: number): Observable<any> {
@@ -48,15 +32,7 @@ export class LogsDataService {
             url += '&limit=' + limit;
         }
 
-        const request: any = {};
-
-        return this.http.get(url, request)
-            .pipe(
-                map(response => {
-                    return response;
-                }),
-                catchError(this.handleError)
-            );
+        return this.http.get(url);
     }
 
     public getLogEvents(group: string, stream: string, startTime: string, endTime: string,
@@ -70,14 +46,6 @@ export class LogsDataService {
             '&filter=' + filter +
             '&limit=' + limit;
 
-        const request: any = {};
-
-        return this.http.get(url, request)
-            .pipe(
-                map(response => {
-                    return response;
-                }),
-                catchError(this.handleError)
-            );
+        return this.http.get(url);
     }
 }

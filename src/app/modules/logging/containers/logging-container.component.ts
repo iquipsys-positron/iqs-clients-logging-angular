@@ -1,13 +1,15 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { series, each } from 'async';
+import { debounce, zip } from 'lodash';
 import { PipSidenavService, PipMediaService } from 'pip-webui2-layouts';
 import { PipNavService } from 'pip-webui2-nav';
-import { BehaviorSubject, Subscription } from 'rxjs';
-import { debounce } from 'lodash';
-import { series, each } from 'async';
+import { BehaviorSubject, Subscription, forkJoin, Observable, of } from 'rxjs';
+import { switchMap, map } from 'rxjs/operators';
 
 import { LoggingContainerTranslations } from './logging-container.strings';
 import { LogsDataService } from '../services/logs.data.service';
+import { EntityState } from 'iqs-libs-clientshell2-angular';
 
 
 @Component({
@@ -30,8 +32,8 @@ export class LoggingContainerComponent implements OnInit, OnDestroy {
     public logStreams = [];
     public logs = [];
 
-    public menuBusy$ = new BehaviorSubject(false);
-    public contentBusy$ = new BehaviorSubject(true);
+    public menuState$ = new BehaviorSubject<EntityState>(EntityState.Progress);
+    public contentState$ = new BehaviorSubject<EntityState>(EntityState.Progress);
     public logsLoading$ = new BehaviorSubject(false);
 
     public language: string;
@@ -54,7 +56,6 @@ export class LoggingContainerComponent implements OnInit, OnDestroy {
         private pipNavService: PipNavService,
         public media: PipMediaService,
     ) {
-        console.log('Logging container loaded');
         this.media.activate();
         this.media.asObservableMain().subscribe((changes) => {
             // console.log(changes);
@@ -68,7 +69,7 @@ export class LoggingContainerComponent implements OnInit, OnDestroy {
     }
 
     public onItemClick(i, j) {
-        this.contentBusy$.next(true);
+        this.contentState$.next(EntityState.Progress);
 
         this.selectedIndex = 0;
         for (let k = 0; k < i; k++) {
@@ -123,13 +124,13 @@ export class LoggingContainerComponent implements OnInit, OnDestroy {
                         message: event.message
                     });
                 });
-                this.contentBusy$.next(false);
+                this.contentState$.next(EntityState.Progress);
                 this.logsLoading$.next(false);
             });
     }
 
     public ngOnInit() {
-        this.menuBusy$.next(true);
+        this.menuState$.next(EntityState.Progress);
 
         series([
             (callback) => {
@@ -161,8 +162,13 @@ export class LoggingContainerComponent implements OnInit, OnDestroy {
 
             }
         ], (err, res) => {
-            this.menuBusy$.next(false);
-            this.onItemClick(0, 0);
+            if (this.logGroups.length && this.logStreams.length) {
+                this.menuState$.next(EntityState.Data);
+                this.onItemClick(0, 0);
+            } else {
+                this.menuState$.next(EntityState.Empty);
+                this.contentState$.next(EntityState.Empty);
+            }
         });
     }
 

@@ -2,44 +2,64 @@
     <pip-menu-layout [single]="isSingle">
 
         <div class="pip-menu">
-            <ng-container [ngSwitch]="menuBusy$ | async">
-                <div class="empty-state-menu" *ngSwitchCase="true"></div>
-                <pip-selected *ngSwitchCase="false" (onSelect)="selectedIndex = $event.index" [index]="selectedIndex">
-                    <mat-nav-list>
-                        <ng-container *ngFor="let group of logGroups; let i = index">
-                            <h2>{{ group }}</h2>
-                            <mat-list-item *ngFor="let item of logStreams[i]; let j = index" pipSelectable (click)="onItemClick(i, j)">
-                                <h4 md-line>{{ item.title }}</h4>
-                            </mat-list-item>
-                        </ng-container>
-                    </mat-nav-list>
-                </pip-selected>
+            <ng-container [ngSwitch]="menuState$ | async">
+                <ng-container *ngSwitchCase="'data'">
+                    <pip-selected (onSelect)="selectedIndex = $event.index" [index]="selectedIndex">
+                        <mat-nav-list>
+                            <ng-container *ngFor="let group of logGroups; let i = index">
+                                <h2>{{ group }}</h2>
+                                <mat-list-item *ngFor="let item of logStreams[i]; let j = index" pipSelectable
+                                    (click)="onItemClick(i, j)">
+                                    <h4 md-line>{{ item.title }}</h4>
+                                </mat-list-item>
+                            </ng-container>
+                        </mat-nav-list>
+                    </pip-selected>
+                </ng-container>
+                <ng-container *ngSwitchDefault>
+                    <div *ngIf="media.isMainActive('gt-sm')" class="empty-state-menu"></div>
+                    <pip-empty-state *ngIf="!media.isMainActive('gt-sm')">
+                        <pip-empty-state-title [text]="'MESSAGE.LOADING' | translate" imageUrl="./assets/progress.svg">
+                        </pip-empty-state-title>
+                        <div class="pip-progress">
+                            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                        </div>
+                    </pip-empty-state>
+                </ng-container>
             </ng-container>
         </div>
 
         <div class="pip-menu-container">
 
             <pip-document-layout>
-                <pip-document-content fxFlex="fill">
+                <pip-document-content fxFlex="fill" *ngIf="contentState$ | async as state">
 
-                    <mat-progress-bar *ngIf="logsLoading$ | async" class="logs-loading-progress-bar" mode="indeterminate"></mat-progress-bar>
+                    <mat-progress-bar *ngIf="logsLoading$ | async" class="logs-loading-progress-bar"
+                        mode="indeterminate"></mat-progress-bar>
 
-                    <ng-container [ngSwitch]="contentBusy$ | async">
+                    <ng-container [ngSwitch]="state">
 
-                        <pip-empty-state *ngSwitchCase="true">
-                            <pip-empty-state-title [text]="'MESSAGE.LOADING' | translate" imageUrl="./assets/progress.svg"></pip-empty-state-title>
+                        <pip-empty-state *ngSwitchCase="'progress'">
+                            <pip-empty-state-title [text]="'MESSAGE.LOADING' | translate"
+                                imageUrl="./assets/progress.svg"></pip-empty-state-title>
                             <div class="pip-progress">
                                 <mat-progress-bar mode="indeterminate"></mat-progress-bar>
                             </div>
                         </pip-empty-state>
 
-                        <div *ngSwitchCase="false">
+                        <pip-empty-state *ngSwitchCase="'empty'">
+                            <pip-empty-state-title [text]="'MESSAGE.EMPTY' | translate"
+                                imageUrl="./assets/empty.svg"></pip-empty-state-title>
+                        </pip-empty-state>
+
+                        <div *ngSwitchCase="'data'">
 
                             <div>
                                 <div>{{'DATE_START' | translate}}</div>
                                 <div>
                                     <pip-time-range-edit [startDate]="startDate$ | async" [endDate]="endDate$ | async"
-                                        (startDateChange)="onStartDateChange($event)" (endDateChange)="onEndDateChange($event)">
+                                        (startDateChange)="onStartDateChange($event)"
+                                        (endDateChange)="onEndDateChange($event)">
                                     </pip-time-range-edit>
                                 </div>
                             </div>
